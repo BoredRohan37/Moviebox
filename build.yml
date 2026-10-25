@@ -1,0 +1,25 @@
+name: Build MovieBox OTT
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Build Release Executable
+        run: cargo build --release
+      
+      - name: Upload Executable Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MovieBox-OTT-Windows-x64
+          path: target/release/moviebox_ott.exe
