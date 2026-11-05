@@ -1,0 +1,34 @@
+name: Windows build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check-and-build:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64-pc-windows-msvc, i686-pc-windows-msvc]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.77.2
+        with:
+          targets: ${{ matrix.target }}
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Format sources
+        run: cargo fmt --all
+      - name: Verify formatting
+        run: cargo fmt --all -- --check
+      - name: Check
+        run: cargo check --target ${{ matrix.target }}
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }}
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-desktop-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/youtube-desktop.exe
