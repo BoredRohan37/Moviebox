@@ -1,0 +1,37 @@
+[package]
+name = "youtube-desktop"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.77"
+license = "GPL-3.0-or-later"
+description = "A lightweight Windows desktop frontend based on youtube-tui"
+
+[dependencies]
+# Reuse the upstream YouTube data client; the Win32 UI remains independent.
+rustypipe = "=0.11.4"
+tokio = { version = "=1.44.1", features = ["rt-multi-thread", "sync", "time", "net", "io-util", "macros"] }
+# Keep RustyPipe's transitive time dependency compatible with the Rust 1.77
+# toolchain, which is needed for Windows 8.1-era system compatibility.
+time = "=0.3.37"
+# Keep URL/IDNA on the Rust 1.77-compatible dependency generation.
+url = "=2.5.4"
+idna = "=1.0.3"
+serde = { version = "=1.0.219", features = ["derive"] }
+serde_json = "=1.0.140"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "=0.59.0", features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Gdi",
+  "Win32_System_LibraryLoader",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_Controls",
+  "Win32_UI_Shell",
+] }
+
+[profile.release]
+opt-level = 2
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
